@@ -1,5 +1,5 @@
 {
-  "name": "bookshelf-schema",
+  "name": "bookshelf-schema-skuid",
   "version": "0.3.2",
   "description": "Plugin for adding schema to Bookshelf models",
   "main": "lib/index.js",
@@ -15,7 +15,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/bogus34/bookshelf-schema"
+    "url": "https://github.com/skuid/bookshelf-schema"
   },
   "devDependencies": {
     "bookshelf": ">=0.8.2 <0.11",
@@ -33,7 +33,8 @@
   },
   "dependencies": {
     "checkit": "^0.7.0",
-    "inflection": "^1.8.0"
+    "inflection": "^1.8.0",
+    "lodash": "^4.17.4"
   },
   "peerDependencies": {
     "bookshelf": ">=0.8.2 <0.11"
