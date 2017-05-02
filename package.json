@@ -1,6 +1,6 @@
 {
   "name": "bookshelf-schema-skuid",
-  "version": "0.3.7",
+  "version": "0.3.8",
   "description": "Plugin for adding schema to Bookshelf models",
   "main": "lib/index.js",
   "scripts": {
