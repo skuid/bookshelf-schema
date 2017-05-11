@@ -1,6 +1,6 @@
 {
   "name": "bookshelf-schema-skuid",
-  "version": "0.3.8",
+  "version": "0.3.9",
   "description": "Plugin for adding schema to Bookshelf models",
   "main": "lib/index.js",
   "scripts": {
@@ -34,8 +34,7 @@
   },
   "dependencies": {
     "checkit": "^0.7.0",
-    "inflection": "^1.8.0",
-    "lodash": "^4.17.4"
+    "inflection": "^1.8.0"
   },
   "peerDependencies": {
     "bookshelf": ">=0.8.2 <0.11"

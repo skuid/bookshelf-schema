@@ -1,4 +1,3 @@
-{result, merge} = require 'lodash'
 Bookshelf = require 'bookshelf'
 Uuid = require 'node-uuid'
 Schema = require '../src/'
@@ -6,7 +5,7 @@ init = require './init'
 Fields = require '../src/fields'
 Relations = require '../src/relations'
 
-{StringField, IntField, EmailField, DateTimeField} = Fields
+{StringField, IntField, EmailField, DateTimeField, UUIDField} = Fields
 {HasMany, BelongsTo} = Relations
 
 describe "Relations", ->
@@ -24,11 +23,8 @@ describe "Relations", ->
                 new Photo(filename: 'photo1.jpg', user_id: alice.id).save()
                 new Photo(filename: 'photo2.jpg', user_id: alice.id).save()
             ]
-            # [alice, photos]
-            pid1 = Uuid.v4()
             post1 = yield new Post(posted_at: new Date, edited_at: new Date, body: "Frist Post", user_id: alice.id).save()
             [alice, photos, post1]
-            pid2 = Uuid.v4()
             post2 = yield new Post(posted_at: new Date, edited_at: new Date, body: "2nd psot", user_id: alice.id).save()
             link = yield new Link(url: 'http://localhost', post_id: post1.id).save()
             [alice, photos, post1, post2, link]
@@ -54,15 +50,17 @@ describe "Relations", ->
                 tableName: 'links'
                 initialize: co ->
                     db.Model.initialize?.call this
-                    def = result this, 'defaults'
-                    this.defaults = merge { 'id': Uuid.v4() }, def
+                    def = this.defaults? || {}
+                    def.id = Uuid.v4()
+                    this.defaults = def
 
             class Post extends db.Model
                 tableName: 'posts'
                 initialize: (attributes, options) ->
                     db.Model.initialize?.call this
-                    def = result this, 'defaults'
-                    this.defaults = merge { 'id': Uuid.v4() }, def
+                    def = this.defaults? || {}
+                    def.id = Uuid.v4()
+                    this.defaults = def
                 @schema [
                     DateTimeField 'posted_at'
                     DateTimeField 'edited_at'
@@ -79,10 +77,10 @@ describe "Relations", ->
 
             Link.schema [
                 StringField 'url'
+                UUIDField 'post_id'
                 BelongsTo Post
             ]
 
-        # afterEach -> init.truncate 'users', 'photos'
         afterEach -> init.truncate 'users', 'photos', 'posts', 'links'
 
         it 'does something relevant', co ->

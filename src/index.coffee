@@ -25,7 +25,6 @@
 ###
 
 CheckIt = require 'checkit'
-_ = require 'lodash'
 utils = require './utils'
 
 plugin = (options = {}) -> (db) ->
@@ -76,20 +75,11 @@ plugin = (options = {}) -> (db) ->
                 schema = statics.schema
                 delete statics.schema
 
-            self = this
-            child = if props.hasOwnProperty 'constructor'
-                props.constructor
-            else
-                -> self.apply(this, arguments)
+            cls = super props, statics
 
-            `extend(child, self)`
-            _.assign child, statics
-            _.assign child.prototype, props
-            self.extended? child
-
-            return child unless schema
-            child.schema schema
-            child
+            return cls unless schema
+            cls.schema schema
+            cls
 
         constructor: (attributes, options) ->
             @constructor.__schema ?= []
