@@ -5,6 +5,8 @@
 #
 ###
 
+utils = require './utils'
+
 class Field
     constructor: (name, options = {}) ->
         return new Field(name) unless this instanceof Field
@@ -34,6 +36,9 @@ class Field
             @_createProperty(cls)
         if @option('validation', true)
             @_appendValidations(cls)
+            # add a copy of the original validations, so they can be changed
+            # for i.e. skipping extended validations, and then restored
+            cls._originalValidations = utils.clone(cls.__bookshelf_schema.validations);
         @_appendFormatter()
         @_appendParser()
         @_appendAlias()
