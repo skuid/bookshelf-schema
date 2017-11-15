@@ -1,3 +1,18 @@
+0.3.6
+=====
+
+* add "string" validation to StringField, thanks to @djedi-knight
+
+0.3.5
+=====
+
+* fix validation with patch error, thanks to @cantado
+
+0.3.4
+=====
+
+* no need to work around Bookshelf inheritance mechanism since v0.10
+
 0.3.3
 =====
 

@@ -24,8 +24,8 @@ describe "Validation", ->
 
     it 'should create array of validations', ->
         User.__bookshelf_schema.validations.should.deep.equal
-            username: ['minLength:3', 'maxLength:15']
-            email: ['email']
+            username: ['string', 'minLength:3', 'maxLength:15']
+            email: ['string', 'email']
 
     it 'should validate models', co ->
         yield [
@@ -65,33 +65,36 @@ describe "Validation", ->
 
     it "when patching should accept validation to passed attributes only", co ->
         f = spy -> true
-        g = spy -> false
+        g = spy -> true
+        h = spy -> false
         class User extends db.Model
             tableName: 'users'
             @schema [
                 StringField 'username', validations: [ f ]
-                StringField 'email', validations: [ g ], required: true
+                StringField 'password', validations: [g]
+                StringField 'email', validations: [ h ], required: true
             ]
 
         user = yield User.forge(username: 'alice').save(null, validation: false)
         user.email = 'foobar'
 
-        yield user.save({username: 'annie'}, {patch: true})
+        yield user.save({username: 'annie', password: 'secret'}, {patch: true})
 
         f.should.have.been.called()
-        g.should.not.have.been.called()
+        g.should.have.been.called()
+        h.should.not.have.been.called()
 
         f.reset()
         g.reset()
 
         try
-            yield user.save({username: 'annie'}, {patch: false})
+            yield user.save({username: 'annie', password: 'secret'}, {patch: false})
         catch
             # pass
 
         f.should.have.been.called()
         g.should.have.been.called()
-
+        h.should.have.been.called()
 
     it 'accepts custom validation rules like Checkit do', co ->
         class User extends db.Model
