@@ -3,3 +3,6 @@ lib
 coverage
 .venv
 doc/_build
+*.sublime-project
+*.sublime-workspace
+
