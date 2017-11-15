@@ -46,7 +46,7 @@
 #
 ###
 
-{pluralize, singularize, camelize} = require 'inflection'
+{pluralize, singularize, camelize, underscore} = require 'inflection'
 {Field, IntField, StringField} = require './fields'
 {Fulfilled, Rejected, promiseFinally, values, upperFirst, lowerFirst} = require './utils'
 
