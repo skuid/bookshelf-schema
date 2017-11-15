@@ -5,6 +5,8 @@
 #
 ###
 
+utils = require './utils'
+
 class Field
     constructor: (name, options = {}) ->
         return new Field(name) unless this instanceof Field
@@ -34,6 +36,9 @@ class Field
             @_createProperty(cls)
         if @option('validation', true)
             @_appendValidations(cls)
+            # add a copy of the original validations, so they can be changed
+            # for i.e. skipping extended validations, and then restored
+            cls._originalValidations = utils.clone(cls.__bookshelf_schema.validations);
         @_appendFormatter()
         @_appendParser()
         @_appendAlias()
@@ -225,16 +230,16 @@ class EncryptedStringField extends Field
         instance.on 'saving', @_onSaving
 
     parse: (attrs, options) ->
-        return attrs unless attrs[@column]?
-        attrs[@column] = new EncryptedString(attrs[@column], null, @options)
+        return attrs unless attrs?[@column]?
+        attrs?[@column] = new EncryptedString(attrs?[@column], null, @options)
         attrs
 
     format: (attrs, options) ->
-        me = attrs[@column]
+        me = attrs?[@column]
         return attrs unless me?
         unless me instanceof EncryptedString and me.encrypted
             throw new Error("Field @name should be encryted first")
-        attrs[@column] = me.encrypted
+        attrs?[@column] = me.encrypted
         attrs
 
     _validateMinLenghth: (value, minLength) ->
@@ -248,11 +253,11 @@ class EncryptedStringField extends Field
         value.length <= maxLength
 
     _onSaving: (instance, attrs, options) =>
-        me = attrs[@column] or instance.attributes[@column]
+        me = attrs?[@column] or instance.attributes[@column]
         return unless me?
         return if me instanceof EncryptedString and not me.plain
         if me not instanceof EncryptedString
-            me = attrs[@column] = instance.attributes[@column] = new EncryptedString null, me, @options
+            me = attrs?[@column] = instance.attributes[@column] = new EncryptedString null, me, @options
         me.encrypt()
 
 class NumberField extends Field
@@ -281,7 +286,7 @@ class IntField extends NumberField
         result
 
     parse: (attrs) ->
-        attrs[@column] = parseInt attrs[@column] if attrs[@column]?
+        attrs[@column] = parseInt attrs[@column] if attrs?[@column]?
 
 class FloatField extends NumberField
     constructor: (name, options) ->
@@ -294,7 +299,7 @@ class FloatField extends NumberField
         result
 
     parse: (attrs) ->
-        attrs[@column] = parseFloat attrs[@column] if attrs[@column]?
+        attrs[@column] = parseFloat attrs[@column] if attrs?[@column]?
 
 class BooleanField extends Field
     constructor: (name, options) ->
@@ -302,10 +307,10 @@ class BooleanField extends Field
         super name, options
 
     parse: (attrs) ->
-        attrs[@column] = !!attrs[@column] if @column of attrs
+        attrs[@column] = !!attrs[@column] if attrs and @column of attrs
 
     format: (attrs) ->
-        attrs[@column] = !!attrs[@column] if @column of attrs
+        attrs[@column] = !!attrs[@column] if attrs and @column of attrs
 
 class DateTimeField extends Field
     constructor: (name, options) ->
@@ -318,10 +323,10 @@ class DateTimeField extends Field
         result
 
     parse: (attrs) ->
-        attrs[@column] = new Date(attrs[@column]) if attrs[@column]?
+        attrs[@column] = new Date(attrs[@column]) if attrs?[@column]?
 
     format: (attrs) ->
-        attrs[@column] = new Date(attrs[@column]) if attrs[@column]? and attrs[@column] not instanceof Date
+        attrs[@column] = new Date(attrs[@column]) if attrs?[@column]? and attrs?[@column] not instanceof Date
 
     _validateDatetime: (value) ->
         return true if value instanceof Date

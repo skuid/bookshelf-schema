@@ -220,8 +220,11 @@ class BelongsTo extends Relation
 
     contributeToSchema: (schema) ->
         super
-        foreignKey = @options.foreignKey or "#{@_relatedModelName().toLowerCase()}_id"
-        pushField schema, foreignKey, IntField(foreignKey)
+        foreignKey = @options.foreignKey
+        if @options.name?
+            foreignKey ?= "#{underscore @options.name}_id"
+        foreignKey ?= "#{underscore @_relatedModelName()}_id"
+        pushField schema, foreignKey, Field(foreignKey)
 
     @injectedMethods: require './relations/belongs_to'
 
@@ -366,7 +369,7 @@ class MorphTo extends Relation
             idName = "#{@polymorphicName}_id"
             typeName = "#{@polymorphicName}_type"
 
-        pushField schema, idName, IntField(idName)
+        pushField schema, idName, Field(idName)
         pushField schema, typeName, StringField(typeName)
 
     _destroyReject: (model, options) ->
